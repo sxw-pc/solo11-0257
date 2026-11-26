@@ -32,13 +32,14 @@ class AdmissionBusiness(unittest.TestCase):
         self.contracts()
         self.assertEqual(one(self.db,"SELECT state FROM contracts WHERE id='c1'")['state'],'active')
         self.assertEqual(contract.run(self.db,{'op':'propose','event_id':'new','id':'c1','revision':2,'mode':'reject','mandatory':True,'owner':'alice'})['decision'],'drafted')
+        self.assertEqual(one(self.db,"SELECT revision FROM contracts WHERE id='c1'")['revision'],1)
         self.assertEqual(contract.run(self.db,{'op':'approve','event_id':'new-a','id':'c1','revision':2,'role':'security','actor':'alice','expires':50,'at':10})['decision'],'approval_recorded')
         self.assertEqual(contract.run(self.db,{'op':'approve','event_id':'new-b','id':'c1','revision':2,'role':'owner','actor':'alice','expires':50,'at':10})['decision'],'approval_recorded')
         self.assertEqual(contract.run(self.db,{'op':'activate','event_id':'new-on','id':'c1','revision':2,'at':11})['decision'],'activation_denied')
 
     def test_waiver_bound_to_tenant_uid_path_and_time(self):
         self.waiver()
-        for id,tenant,uid,path,at in [('a','tenant-b','pod-1','/spec/replicas',10),('b','tenant-a','pod-new','/spec/replicas',10),('c','tenant-a','pod-1','/other',10),('d','tenant-a','pod-1','/spec/replicas',31)]:
+        for id,tenant,uid,path,at in [('a','tenant-b','pod-1','/spec/replicas',10),('b','tenant-a','pod-new','/spec/replicas',10),('c','tenant-a','pod-1','/spec/other',10),('d','tenant-a','pod-1','/spec/replicas',31)]:
             admit.run(self.db,{'op':'submit','event_id':id+'s','id':id,'tenant':tenant,'uid':uid,'body':{'n':1},'at':at})
             admit.run(self.db,{'op':'call','event_id':id+'1','id':id+'1','request':id,'contract':'c1','outcome':'allow','at':at})
             admit.run(self.db,{'op':'call','event_id':id+'2','id':id+'2','request':id,'contract':'c2','outcome':'deny','path':path,'at':at})
@@ -48,6 +49,10 @@ class AdmissionBusiness(unittest.TestCase):
         self.waiver()
         admit.run(self.db,{'op':'submit','event_id':'pending','id':'pending','tenant':'tenant-a','uid':'pod-1','body':{},'at':10})
         contract.run(self.db,{'op':'propose','event_id':'revision','id':'c2','revision':2,'mode':'reject','mandatory':False,'owner':'bob'})
+        self.assertEqual(one(self.db,"SELECT state FROM waiver_requests WHERE id='w1'")['state'],'active')
+        contract.run(self.db,{'op':'approve','event_id':'rev-a1','id':'c2','revision':2,'role':'security','actor':'sue','expires':50,'at':10})
+        contract.run(self.db,{'op':'approve','event_id':'rev-a2','id':'c2','revision':2,'role':'owner','actor':'bob','expires':50,'at':10})
+        contract.run(self.db,{'op':'activate','event_id':'rev-on','id':'c2','revision':2,'at':11})
         self.assertEqual(one(self.db,"SELECT state FROM waiver_requests WHERE id='w1'")['state'],'stale')
         self.assertEqual(admit.run(self.db,{'op':'decide','event_id':'pending-d','id':'pending','at':11})['decision'],'contract_changed')
 
@@ -58,6 +63,16 @@ class AdmissionBusiness(unittest.TestCase):
         for cid in ['c1','c2']:
             admit.run(self.db,{'op':'call','event_id':'x-'+cid,'id':'x-'+cid,'request':'x','contract':cid,'outcome':'allow' if cid=='c1' else 'deny','path':'/spec/replicas','at':11})
         self.assertEqual(admit.run(self.db,{'op':'decide','event_id':'x-d','id':'x','path':'/spec/replicas','at':12})['decision'],'denied')
+
+    def test_mandatory_contract_remains_active_during_upgrade_draft(self):
+        self.contracts()
+        self.assertEqual(contract.run(self.db,{'op':'propose','event_id':'upgrade','id':'c1','revision':2,'mode':'degrade','mandatory':True,'owner':'alice'})['decision'],'drafted')
+        self.assertEqual(one(self.db,"SELECT revision FROM contracts WHERE id='c1'")['revision'],1)
+        result=admit.run(self.db,{'op':'submit','event_id':'submit','id':'request','tenant':'tenant-a','uid':'pod-1','body':{},'at':10})
+        self.assertEqual(result['contracts'],['c1','c2'])
+        admit.run(self.db,{'op':'call','event_id':'call1','id':'call1','request':'request','contract':'c1','outcome':'timeout','at':11})
+        admit.run(self.db,{'op':'call','event_id':'call2','id':'call2','request':'request','contract':'c2','outcome':'allow','at':11})
+        self.assertEqual(admit.run(self.db,{'op':'decide','event_id':'decision','id':'request','at':12})['reason'],'mandatory_timeout')
 
     def test_denial_path_comes_from_webhook_not_decider(self):
         self.waiver()

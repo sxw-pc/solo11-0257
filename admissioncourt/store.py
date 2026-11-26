@@ -4,6 +4,7 @@ from contextlib import contextmanager
 
 SCHEMA = '''
 CREATE TABLE IF NOT EXISTS contracts(id TEXT PRIMARY KEY, revision INTEGER, mode TEXT, mandatory INTEGER, state TEXT, owner TEXT);
+CREATE TABLE IF NOT EXISTS contract_revisions(id TEXT,revision INTEGER,mode TEXT,mandatory INTEGER,state TEXT,owner TEXT,PRIMARY KEY(id,revision));
 CREATE TABLE IF NOT EXISTS contract_approvals(contract_id TEXT, revision INTEGER, role TEXT, actor TEXT, expires INTEGER, PRIMARY KEY(contract_id,revision,role));
 CREATE TABLE IF NOT EXISTS mutation_scopes(contract_id TEXT, revision INTEGER, path TEXT, behavior TEXT, PRIMARY KEY(contract_id,revision,path));
 CREATE TABLE IF NOT EXISTS waiver_requests(id TEXT PRIMARY KEY, tenant TEXT, uid TEXT, path TEXT, contract_id TEXT, contract_revision INTEGER, expires INTEGER, state TEXT);
@@ -50,7 +51,7 @@ def act(db,subsystem,x,handler):
         db.execute('INSERT INTO events(subsystem,event_id,payload,result) VALUES(?,?,?,?)',(subsystem,event,body,json.dumps(result,ensure_ascii=False,sort_keys=True)))
         return result
 
-TABLES=['contracts','contract_approvals','mutation_scopes','waiver_requests','waiver_approvals','admission_requests','webhook_calls','admission_verdicts']
+TABLES=['contracts','contract_revisions','contract_approvals','mutation_scopes','waiver_requests','waiver_approvals','admission_requests','webhook_calls','admission_verdicts']
 def replay(path):
     from . import contract,waiver,admit
     source=connect(path); target=connect(':memory:')

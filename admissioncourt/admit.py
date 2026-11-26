@@ -23,6 +23,8 @@ def handle(db,x):
         if x['outcome'] not in ('allow','deny','timeout','patch'):return {'decision':'invalid_call'}
         if x['outcome'] in ('patch','deny') and not x.get('path'):
             return {'decision':'call_path_required'}
+        if x['outcome']=='deny' and not one(db,'SELECT 1 FROM mutation_scopes WHERE contract_id=? AND revision=? AND path=?',(c['id'],c['revision'],x['path'])):
+            return {'decision':'undeclared_denial_path'}
         if x['outcome']=='patch' and not one(db,'SELECT 1 FROM mutation_scopes WHERE contract_id=? AND revision=? AND path=?',(c['id'],c['revision'],x['path'])):
             return {'decision':'undeclared_patch'}
         if one(db,'SELECT 1 FROM webhook_calls WHERE request_id=? AND contract_id=?',(x['request'],x['contract'])):

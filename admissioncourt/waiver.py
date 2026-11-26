@@ -4,7 +4,8 @@ def handle(db,x):
     op=x['op']
     if op=='request':
         c=one(db,'SELECT * FROM contracts WHERE id=?',(x['contract'],))
-        if not c or c['state']!='active' or c['mandatory'] or not x['path'].startswith('/') or x['expires']<=x['at']:
+        scope=one(db,'SELECT 1 FROM mutation_scopes WHERE contract_id=? AND revision=? AND path=?',(x['contract'],c['revision'],x['path'])) if c else None
+        if not c or c['state']!='active' or c['mandatory'] or not scope or x['expires']<=x['at']:
             return {'decision':'waiver_request_denied'}
         old=one(db,'SELECT * FROM waiver_requests WHERE id=?',(x['id'],))
         if old:return {'decision':'request_identity_conflict'}

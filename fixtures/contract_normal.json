@@ -61,6 +61,14 @@
     "op": "scope"
   },
   {
+    "event_id": "c2s-other",
+    "revision": 1,
+    "path": "/spec/other",
+    "id": "c2",
+    "behavior": "exclusive",
+    "op": "scope"
+  },
+  {
     "at": 1,
     "id": "c2",
     "actor": "sue",
