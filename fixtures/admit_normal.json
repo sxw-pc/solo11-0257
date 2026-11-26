@@ -1,0 +1,76 @@
+[
+  {
+    "body": {
+      "image": "v1"
+    },
+    "at": 10,
+    "id": "r1",
+    "event_id": "r1s",
+    "uid": "pod-1",
+    "tenant": "tenant-a",
+    "op": "submit"
+  },
+  {
+    "request": "r1",
+    "at": 11,
+    "id": "call-r1-c1",
+    "event_id": "r1c1",
+    "contract": "c1",
+    "outcome": "allow",
+    "op": "call"
+  },
+  {
+    "request": "r1",
+    "at": 11,
+    "id": "call-r1-c2",
+    "event_id": "r1c2",
+    "contract": "c2",
+    "outcome": "deny",
+    "op": "call",
+    "path": "/spec/replicas"
+  },
+  {
+    "op": "decide",
+    "id": "r1",
+    "at": 12,
+    "event_id": "r1d",
+    "path": "/spec/replicas"
+  },
+  {
+    "body": {
+      "image": "v1"
+    },
+    "at": 13,
+    "id": "r2",
+    "event_id": "r2s",
+    "uid": "pod-2",
+    "tenant": "tenant-a",
+    "op": "submit"
+  },
+  {
+    "id": "call-r2-c1",
+    "outcome": "patch",
+    "request": "r2",
+    "value": "v2",
+    "at": 14,
+    "op": "call",
+    "path": "/spec/image",
+    "contract": "c1",
+    "event_id": "r2c1"
+  },
+  {
+    "request": "r2",
+    "at": 14,
+    "id": "call-r2-c2",
+    "event_id": "r2c2",
+    "contract": "c2",
+    "outcome": "timeout",
+    "op": "call"
+  },
+  {
+    "op": "decide",
+    "id": "r2",
+    "at": 15,
+    "event_id": "r2d"
+  }
+]

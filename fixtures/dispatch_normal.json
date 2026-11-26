@@ -1,0 +1,22 @@
+{
+  "channels": [
+    {
+      "id": "delivery-a",
+      "slots": 3
+    }
+  ],
+  "manifests": [
+    {
+      "request": "r1",
+      "digest": "37af572e49697f3cdc3c69a86b131b3acb777b95e3c3966d264e0fb7410bfaa8",
+      "channel": "delivery-a",
+      "slots": 2
+    },
+    {
+      "request": "r2",
+      "digest": "7101e5c4ad50ecccfafc6321e25f166fbe6c9733fbe2c7d021ececae1b3ff0a9",
+      "channel": "delivery-a",
+      "slots": 2
+    }
+  ]
+}
