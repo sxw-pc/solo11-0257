@@ -1,0 +1,28 @@
+{
+  "bays": {
+    "A": {
+      "initial": 20,
+      "heat": 0,
+      "neighbors": [
+        "B"
+      ]
+    },
+    "B": {
+      "initial": 23,
+      "heat": 1,
+      "neighbors": [
+        "A"
+      ]
+    }
+  },
+  "steps": [
+    {
+      "A": 1,
+      "B": 2
+    },
+    {
+      "A": 0,
+      "B": 0
+    }
+  ]
+}
