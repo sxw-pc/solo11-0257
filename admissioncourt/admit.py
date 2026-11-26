@@ -33,6 +33,7 @@ def handle(db,x):
         return {'decision':'call_recorded'}
     if op=='decide':
         req=one(db,'SELECT * FROM admission_requests WHERE id=?',(x['id'],))
+        if req and req['state']=='stale':return {'decision':'contract_changed'}
         if not req or req['state']!='pending':return {'decision':'request_not_pending'}
         snapshot=json.loads(req['contract_snapshot']); calls=many(db,'SELECT * FROM webhook_calls WHERE request_id=?',(x['id'],))
         missing=[]; failures=[]; patches=[]; used=[]

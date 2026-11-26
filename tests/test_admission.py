@@ -74,6 +74,19 @@ class AdmissionBusiness(unittest.TestCase):
         admit.run(self.db,{'op':'call','event_id':'call2','id':'call2','request':'request','contract':'c2','outcome':'allow','at':11})
         self.assertEqual(admit.run(self.db,{'op':'decide','event_id':'decision','id':'request','at':12})['reason'],'mandatory_timeout')
 
+    def test_new_mandatory_contract_invalidates_pending_snapshot(self):
+        self.contracts()
+        admit.run(self.db,{'op':'submit','event_id':'req','id':'req','tenant':'tenant-a','uid':'pod-1','body':{},'at':10})
+        for cid in ('c1','c2'):
+            admit.run(self.db,{'op':'call','event_id':'call-'+cid,'id':'call-'+cid,'request':'req','contract':cid,'outcome':'allow','at':11})
+        contract.run(self.db,{'op':'propose','event_id':'c3','id':'c3','revision':1,'mode':'reject','mandatory':True,'owner':'carol'})
+        contract.run(self.db,{'op':'approve','event_id':'c3s','id':'c3','revision':1,'role':'security','actor':'sue','expires':50,'at':11})
+        contract.run(self.db,{'op':'approve','event_id':'c3o','id':'c3','revision':1,'role':'owner','actor':'carol','expires':50,'at':11})
+        self.assertEqual(contract.run(self.db,{'op':'activate','event_id':'c3on','id':'c3','revision':1,'at':12})['decision'],'activated')
+        self.assertEqual(one(self.db,"SELECT state FROM admission_requests WHERE id='req'")['state'],'stale')
+        self.assertEqual(admit.run(self.db,{'op':'decide','event_id':'req-d','id':'req','at':13})['decision'],'contract_changed')
+        self.assertIsNone(one(self.db,"SELECT * FROM admission_verdicts WHERE request_id='req'"))
+
     def test_denial_path_comes_from_webhook_not_decider(self):
         self.waiver()
         admit.run(self.db,{'op':'submit','event_id':'rq','id':'rq','tenant':'tenant-a','uid':'pod-1','body':{},'at':10})

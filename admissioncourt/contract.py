@@ -38,6 +38,7 @@ def handle(db,x):
         db.execute("UPDATE contract_revisions SET state='superseded' WHERE id=? AND state='active'",(x['id'],))
         db.execute("UPDATE contract_revisions SET state='active' WHERE id=? AND revision=?",(x['id'],x['revision']))
         db.execute('INSERT INTO contracts VALUES(?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET revision=excluded.revision,mode=excluded.mode,mandatory=excluded.mandatory,state=excluded.state,owner=excluded.owner',(x['id'],x['revision'],c['mode'],c['mandatory'],'active',c['owner']))
+        db.execute("UPDATE admission_requests SET state='stale' WHERE state='pending'")
         db.execute("UPDATE waiver_requests SET state='stale' WHERE contract_id=? AND contract_revision<? AND state='active'",(x['id'],x['revision']))
         return {'decision':'activated'}
     if op=='withdraw':
