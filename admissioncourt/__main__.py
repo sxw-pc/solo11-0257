@@ -1,15 +1,20 @@
 import argparse,json
 from pathlib import Path
+from . import dispatch
+from . import dispatch
 from .store import connect,replay,many
 from . import contract,waiver,admit
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('command',choices=['contract','waiver','admit','demo','replay','report']);p.add_argument('--db',default='demo.sqlite');p.add_argument('--fixture');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('command',choices=['contract','waiver','admit','demo','replay','report','dispatch']);p.add_argument('--db',default='demo.sqlite');p.add_argument('--fixture');a=p.parse_args()
     if a.command=='replay':
         result=replay(a.db)
     else:
         db=connect(a.db)
-        if a.command=='report':result=many(db,'SELECT * FROM events ORDER BY seq')
+        if a.command=='dispatch':
+            if not a.fixture:p.error('--fixture required')
+            result=dispatch.run(db,json.loads(Path(a.fixture).read_text(encoding='utf-8')))
+        elif a.command=='report':result=many(db,'SELECT * FROM events ORDER BY seq')
         else:
             paths=([Path('fixtures')/n for n in ['contract_normal.json','waiver_normal.json','admit_normal.json','contract_failure.json','waiver_failure.json','admit_failure.json']]
                    if a.command=='demo' else [Path(a.fixture)] if a.fixture else [])
