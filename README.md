@@ -1,0 +1,13 @@
+# 准入 Webhook 降级契约与豁免庭
+
+离线模拟 Kubernetes 准入 Webhook 的契约、租户豁免和请求裁定。只保存合成对象摘要和回执，不连接真实集群。Python 3.11+ 标准库即可运行。
+
+三个独立入口：`contract` 决定契约代际、范围与超时模式；`waiver` 决定租户、UID、路径和期限内的例外；`admit` 固定请求契约快照，收集调用并形成可复算准入结论。强制契约不能被豁免；契约换代或撤销使未决请求与旧豁免失效。
+
+```sh
+python -m admissioncourt demo --db demo.sqlite
+python -m admissioncourt replay --db demo.sqlite
+python -m unittest discover -s tests -v
+```
+
+三个入口也可依次执行 `fixtures/contract_normal.json`、`waiver_normal.json`、`admit_normal.json` 和对应 `_failure.json`。重复事件按 `event_id` 和原文幂等，冲突内容明确拒绝。`replay` 在空库重新执行每一条事件，并逐业务表比较持久状态。示例使用固定逻辑时刻，不存真实凭据。生产系统需另行实现 Webhook 网络层与可靠的操作者身份认证。
