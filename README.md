@@ -13,3 +13,5 @@ python -m unittest discover -s tests -v
 三个入口也可依次执行 `fixtures/contract_normal.json`、`waiver_normal.json`、`admit_normal.json` 和对应 `_failure.json`。重复事件按 `event_id` 和原文幂等，冲突内容明确拒绝。`replay` 在空库重新执行每一条事件，并逐业务表比较持久状态。示例使用固定逻辑时刻，不存真实凭据。生产系统需另行实现 Webhook 网络层与可靠的操作者身份认证。
 
 `python -m admissioncourt dispatch --db demo.sqlite --fixture fixtures/dispatch_normal.json` 基于 demo 数据库按接收容量预留合成清单。输入必须引用已经准入的请求及其最终摘要。
+
+`python -m admissioncourt projections --db demo.sqlite --fixture fixtures/projections_normal.json` 查看实际已提交请求和给定基线的字段变化。
