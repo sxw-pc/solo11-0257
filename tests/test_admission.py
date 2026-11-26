@@ -116,6 +116,15 @@ class AdmissionBusiness(unittest.TestCase):
         self.assertEqual(admit.run(self.db,command)['decision'],'call_recorded')
         self.assertEqual(admit.run(self.db,dict(command,value='v3'))['decision'],'event_identity_conflict')
 
+    def test_two_webhooks_cannot_exclusively_patch_same_field(self):
+        self.contracts()
+        admit.run(self.db,{'op':'submit','event_id':'request','id':'request','tenant':'tenant-a','uid':'pod-1','body':{'image':'v1'},'at':10})
+        for cid,value in [('c1','v2'),('c2','v3')]:
+            self.assertEqual(admit.run(self.db,{'op':'call','event_id':'call-'+cid,'id':'call-'+cid,'request':'request','contract':cid,'outcome':'patch','path':'/spec/image','value':value,'at':11})['decision'],'call_recorded')
+        result=admit.run(self.db,{'op':'decide','event_id':'decide','id':'request','at':12})
+        self.assertEqual((result['decision'],result['reason']),('denied','mutation_conflict:/spec/image'))
+        self.assertIsNone(one(self.db,"SELECT final_hash FROM admission_verdicts WHERE request_id='request'")['final_hash'])
+
     def test_request_identity_conflict_does_not_replace_original(self):
         self.contracts()
         command={'op':'submit','event_id':'r1','id':'business-r','tenant':'t','uid':'pod-u','body':{'image':'v1'},'at':1}

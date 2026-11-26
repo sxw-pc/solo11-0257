@@ -69,6 +69,14 @@
     "op": "scope"
   },
   {
+    "behavior": "exclusive",
+    "event_id": "c2s-image",
+    "id": "c2",
+    "revision": 1,
+    "op": "scope",
+    "path": "/spec/image"
+  },
+  {
     "at": 1,
     "id": "c2",
     "actor": "sue",
