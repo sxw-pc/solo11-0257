@@ -1,0 +1,37 @@
+[
+  {
+    "id": "w1",
+    "uid": "pod-1",
+    "tenant": "tenant-a",
+    "expires": 30,
+    "at": 3,
+    "op": "request",
+    "path": "/spec/replicas",
+    "contract": "c2",
+    "event_id": "w1r"
+  },
+  {
+    "actor": "sue",
+    "role": "security",
+    "at": 4,
+    "id": "w1",
+    "event_id": "w1a1",
+    "expires": 29,
+    "op": "approve"
+  },
+  {
+    "actor": "bob",
+    "role": "owner",
+    "at": 4,
+    "id": "w1",
+    "event_id": "w1a2",
+    "expires": 29,
+    "op": "approve"
+  },
+  {
+    "op": "activate",
+    "id": "w1",
+    "at": 5,
+    "event_id": "w1on"
+  }
+]

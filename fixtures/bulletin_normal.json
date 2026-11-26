@@ -1,0 +1,10 @@
+{"bulletin":"exercise-1","readers":["operations","service-a"],"drill":
+{
+  "routes": [{"id": "service-a", "prefix": "/job", "backends": ["new", "old"]}],
+  "replicas": {
+    "new": {"state": "healthy", "status": 200, "revision": "v2"},
+    "old": {"state": "healthy", "status": 500, "revision": "v1"}
+  },
+  "samples": [{"path": "/job/x", "count": 4}, {"path": "/missing", "count": 1}]
+}
+}
