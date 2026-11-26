@@ -1,0 +1,17 @@
+[
+  {
+    "mode": "degrade",
+    "revision": 1,
+    "id": "c1",
+    "event_id": "c1old",
+    "owner": "fake",
+    "mandatory": false,
+    "op": "propose"
+  },
+  {
+    "op": "withdraw",
+    "id": "c2",
+    "revision": 1,
+    "event_id": "c2off"
+  }
+]
