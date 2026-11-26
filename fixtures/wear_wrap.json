@@ -1,0 +1,21 @@
+{
+  "equipment": [
+    {
+      "position": "rack-01/fan",
+      "carried_minutes": 90,
+      "service_limit": 100
+    }
+  ],
+  "readings": [
+    {
+      "position": "rack-01/fan",
+      "at": 0,
+      "minutes": 94
+    },
+    {
+      "position": "rack-01/fan",
+      "at": 12,
+      "minutes": 6
+    }
+  ]
+}
