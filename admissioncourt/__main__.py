@@ -1,5 +1,6 @@
 import argparse,json
 from pathlib import Path
+from . import checkpoint
 from . import projections
 from . import dispatch
 from . import dispatch
@@ -7,12 +8,16 @@ from .store import connect,replay,many
 from . import contract,waiver,admit
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('command',choices=['contract','waiver','admit','demo','replay','report','dispatch','projections']);p.add_argument('--db',default='demo.sqlite');p.add_argument('--fixture');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('command',choices=['contract','waiver','admit','demo','replay','report','dispatch','projections','checkpoint']);p.add_argument('--db',default='demo.sqlite');p.add_argument('--fixture');a=p.parse_args()
     if a.command=='replay':
         result=replay(a.db)
     else:
         db=connect(a.db)
-        if a.command=='projections':
+        if a.command=='checkpoint':
+            if not a.fixture:
+                p.error('--fixture required')
+            result=checkpoint.run(db,json.loads(Path(a.fixture).read_text(encoding='utf-8')))
+        elif a.command=='projections':
             if not a.fixture:p.error('--fixture required')
             result=projections.run(db,json.loads(Path(a.fixture).read_text(encoding='utf-8')))
         elif a.command=='dispatch':
@@ -32,4 +37,3 @@ def main():
     print(json.dumps(result,ensure_ascii=False,indent=2))
     if a.command=='replay' and not result['verified']:raise SystemExit(2)
 if __name__=='__main__':main()
-

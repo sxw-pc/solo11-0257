@@ -15,3 +15,5 @@ python -m unittest discover -s tests -v
 `python -m admissioncourt dispatch --db demo.sqlite --fixture fixtures/dispatch_normal.json` 基于 demo 数据库按接收容量预留合成清单。输入必须引用已经准入的请求及其最终摘要。
 
 `python -m admissioncourt projections --db demo.sqlite --fixture fixtures/projections_normal.json` 查看实际已提交请求和给定基线的字段变化。
+
+`python -m admissioncourt checkpoint --db demo.sqlite --fixture fixtures/checkpoint_normal.json` 从数据库历史的指定已提交事件切点重建离线状态。
