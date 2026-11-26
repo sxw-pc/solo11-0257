@@ -1,0 +1,33 @@
+{
+  "catalog": {
+    "providers": [
+      {
+        "name": "markup",
+        "edition": 1,
+        "available": true,
+        "exports": {
+          "join": {
+            "separator": "|"
+          }
+        }
+      }
+    ]
+  },
+  "sources": {
+    "front": "header",
+    "back": "body"
+  },
+  "artifact": "page",
+  "recipe": [
+    {
+      "id": "join-1",
+      "tool": "markup",
+      "operation": "join",
+      "inputs": [
+        "front",
+        "back"
+      ],
+      "output": "page"
+    }
+  ]
+}

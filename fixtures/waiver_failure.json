@@ -1,0 +1,18 @@
+[
+  {
+    "op": "revoke",
+    "id": "w1",
+    "event_id": "w1off"
+  },
+  {
+    "id": "wbad",
+    "uid": "pod-x",
+    "tenant": "tenant-b",
+    "expires": 30,
+    "at": 20,
+    "op": "request",
+    "path": "/spec/image",
+    "contract": "c1",
+    "event_id": "wbad"
+  }
+]

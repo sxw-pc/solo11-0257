@@ -1,0 +1,47 @@
+{
+  "catalog": {
+    "providers": [
+      {
+        "name": "job-ledger",
+        "edition": 1,
+        "available": true,
+        "exports": {
+          "add": {
+            "arity": 1,
+            "offset": 10
+          }
+        }
+      },
+      {
+        "name": "job-ledger",
+        "edition": 2,
+        "available": true,
+        "exports": {
+          "add": {
+            "arity": 2,
+            "offset": 10
+          }
+        }
+      }
+    ]
+  },
+  "calls": [
+    {
+      "id": "old",
+      "component": "job-ledger",
+      "operation": "add",
+      "arguments": [
+        5
+      ]
+    },
+    {
+      "id": "new",
+      "component": "job-ledger",
+      "operation": "add",
+      "arguments": [
+        2,
+        3
+      ]
+    }
+  ]
+}
