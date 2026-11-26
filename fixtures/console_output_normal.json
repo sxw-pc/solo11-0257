@@ -1,0 +1,34 @@
+{
+  "controller_pid": 1,
+  "pipe": "stdio-1",
+  "events": [
+    {
+      "op": "start",
+      "pid": 1,
+      "pipe": "stdio-1"
+    },
+    {
+      "op": "write",
+      "pid": 1,
+      "text": "parent=2\n"
+    },
+    {
+      "op": "start",
+      "pid": 2,
+      "pipe": "stdio-1"
+    },
+    {
+      "op": "exit",
+      "pid": 1
+    },
+    {
+      "op": "write",
+      "pid": 2,
+      "text": "worker=3\n"
+    },
+    {
+      "op": "exit",
+      "pid": 2
+    }
+  ]
+}

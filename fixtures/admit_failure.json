@@ -1,0 +1,28 @@
+[
+  {
+    "body": {
+      "image": "v1"
+    },
+    "at": 20,
+    "id": "r3",
+    "event_id": "r3s",
+    "uid": "pod-3",
+    "tenant": "tenant-a",
+    "op": "submit"
+  },
+  {
+    "request": "r3",
+    "at": 21,
+    "id": "call-r3-c1",
+    "event_id": "r3c1",
+    "contract": "c1",
+    "outcome": "timeout",
+    "op": "call"
+  },
+  {
+    "op": "decide",
+    "id": "r3",
+    "at": 22,
+    "event_id": "r3d"
+  }
+]
