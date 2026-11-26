@@ -1,0 +1,106 @@
+[
+  {
+    "mode": "reject",
+    "revision": 1,
+    "id": "c1",
+    "event_id": "c1p",
+    "owner": "alice",
+    "mandatory": true,
+    "op": "propose"
+  },
+  {
+    "behavior": "exclusive",
+    "revision": 1,
+    "id": "c1",
+    "event_id": "c1s",
+    "path": "/spec/image",
+    "op": "scope"
+  },
+  {
+    "at": 1,
+    "id": "c1",
+    "actor": "sue",
+    "role": "security",
+    "event_id": "c1a1",
+    "revision": 1,
+    "expires": 100,
+    "op": "approve"
+  },
+  {
+    "at": 1,
+    "id": "c1",
+    "actor": "alice",
+    "role": "owner",
+    "event_id": "c1a2",
+    "revision": 1,
+    "expires": 100,
+    "op": "approve"
+  },
+  {
+    "op": "activate",
+    "id": "c1",
+    "at": 2,
+    "revision": 1,
+    "event_id": "c1on"
+  },
+  {
+    "mode": "degrade",
+    "revision": 1,
+    "id": "c2",
+    "event_id": "c2p",
+    "owner": "bob",
+    "mandatory": false,
+    "op": "propose"
+  },
+  {
+    "behavior": "exclusive",
+    "revision": 1,
+    "id": "c2",
+    "event_id": "c2s",
+    "path": "/spec/replicas",
+    "op": "scope"
+  },
+  {
+    "event_id": "c2s-other",
+    "revision": 1,
+    "path": "/spec/other",
+    "id": "c2",
+    "behavior": "exclusive",
+    "op": "scope"
+  },
+  {
+    "behavior": "exclusive",
+    "event_id": "c2s-image",
+    "id": "c2",
+    "revision": 1,
+    "op": "scope",
+    "path": "/spec/image"
+  },
+  {
+    "at": 1,
+    "id": "c2",
+    "actor": "sue",
+    "role": "security",
+    "event_id": "c2a1",
+    "revision": 1,
+    "expires": 100,
+    "op": "approve"
+  },
+  {
+    "at": 1,
+    "id": "c2",
+    "actor": "bob",
+    "role": "owner",
+    "event_id": "c2a2",
+    "revision": 1,
+    "expires": 100,
+    "op": "approve"
+  },
+  {
+    "op": "activate",
+    "id": "c2",
+    "at": 2,
+    "revision": 1,
+    "event_id": "c2on"
+  }
+]

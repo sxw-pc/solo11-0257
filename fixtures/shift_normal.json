@@ -1,0 +1,41 @@
+{
+  "rack": {
+    "feeds": {
+      "north": {
+        "online": true,
+        "limit": 1400
+      },
+      "south": {
+        "online": true,
+        "limit": 850
+      }
+    },
+    "loads": [
+      {
+        "id": "s1",
+        "watts": 550,
+        "feeds": [
+          "north",
+          "south"
+        ]
+      },
+      {
+        "id": "s2",
+        "watts": 350,
+        "feeds": [
+          "south"
+        ]
+      }
+    ]
+  },
+  "jobs": [
+    {
+      "id": "render-a",
+      "load": "s1"
+    },
+    {
+      "id": "render-b",
+      "load": "s2"
+    }
+  ]
+}
