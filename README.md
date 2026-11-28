@@ -27,3 +27,21 @@ python -m unittest discover -s tests -v
 `python -m admissioncourt components --fixture fixtures/components_normal.json` lists resolved simulation components. `python -m admissioncourt component-host --fixture fixtures/component_host_normal.json` runs synthetic operations and reports incompatibility for the legacy caller. The host never loads external binaries.
 
 Run `python -m admissioncourt assembly --fixture fixtures/assembly_normal.json` for an actual fixture build, or `python -m admissioncourt build-compare --fixture fixtures/build_compare_normal.json` to build and compare the two artifacts. The declared tools only join fixture strings; no external executables are used.
+
+## 离线构建交接
+
+Byte-identical artifacts on handover day do not prove the receiver can maintain a build after the owner's directory is gone. `handover_build` materializes a self-contained handover package and exercises every claimed edit through the real `assembly` engine before the package is allowed to ship.
+
+```sh
+python -m admissioncourt handover-build --fixture fixtures/handover_transfer_normal.json --package out/transfer
+python -m admissioncourt handover-consume --package out/transfer --edit edit-right
+python -m admissioncourt handover-consume --package out/transfer --set left=next
+```
+
+Two delivery contracts per licensed tool drive the boundary:
+
+- `transfer` — the tool description and every source it consumes are packaged, so the receiver independently rebuilds every step. Both `edit-right` and `edit-left` deliver byte-identical owner truth.
+- `intermediate` — the restricted tool description is never copied. Only the real sealed intermediate (`sealed/markup-step.txt`) ships, with provenance naming the exact tool identity (name, edition, export digest) and the exact source roles/digests it consumed. `edit-right` still delivers; `edit-left` returns a precise `rebuild_request` naming the missing tool right and the replaced sealed input. The package never contains the restricted edit's full artifact — only its digest.
+
+Maintenance scope follows source *roles*, not current bytes: `left` and `right` start byte-identical yet carry different rights, and swapping their aliases while keeping the handover-day artifact unchanged moves the boundary with the roles. A sealed intermediate is reusable only while its consumed roles are untouched and match the recorded digests; equal bytes from another role never satisfy provenance, and an edit replacing a sealed input cannot be served from any shared content cache. Tool edition remapping or any material change fails package digest verification (`material_tampered`), and a package whose declared edits are all blocked is refused with `no_independent_maintenance` and removed from disk. Non-delivery CLI results exit with status 2.
+

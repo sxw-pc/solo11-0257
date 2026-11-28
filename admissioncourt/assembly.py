@@ -3,7 +3,7 @@ from .admit import hash_value
 from . import components
 
 
-def run(fixture):
+def run(fixture, files_out=None):
     tools = components.select(fixture['catalog'])
     files = dict(fixture['sources'])
     trace = []
@@ -17,6 +17,8 @@ def run(fixture):
         contents = [files[name] for name in step['inputs']]
         output = operation['separator'].join(contents)
         files[step['output']] = output
+        if files_out is not None:
+            files_out[step['output']] = output
         trace.append({'step':step['id'], 'tool':step['tool'], 'edition':tool['edition'],
                       'inputs':[hash_value(content) for content in contents], 'result':hash_value(output)})
     return {'decision':'built', 'artifact':files[fixture['artifact']], 'trace':trace}

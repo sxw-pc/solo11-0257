@@ -1,0 +1,93 @@
+{
+  "catalog": {
+    "providers": [
+      {
+        "name": "markup",
+        "edition": 1,
+        "available": true,
+        "exports": {
+          "join": {
+            "separator": "|"
+          }
+        }
+      },
+      {
+        "name": "common",
+        "edition": 1,
+        "available": true,
+        "exports": {
+          "join": {
+            "separator": "/"
+          }
+        }
+      }
+    ]
+  },
+  "sources": {
+    "theme": "skin",
+    "left": "same",
+    "right": "same"
+  },
+  "artifact": "page",
+  "grants": [
+    {
+      "tool": "markup",
+      "mode": "transfer"
+    },
+    {
+      "tool": "common",
+      "mode": "transfer"
+    }
+  ],
+  "recipe": [
+    {
+      "id": "markup-step",
+      "tool": "markup",
+      "operation": "join",
+      "inputs": [
+        "theme",
+        "left"
+      ],
+      "output": "stage-x"
+    },
+    {
+      "id": "prepare-right",
+      "tool": "common",
+      "operation": "join",
+      "inputs": [
+        "right"
+      ],
+      "output": "stage-y"
+    },
+    {
+      "id": "merge",
+      "tool": "common",
+      "operation": "join",
+      "inputs": [
+        "stage-x",
+        "stage-y"
+      ],
+      "output": "page"
+    }
+  ],
+  "edits": [
+    {
+      "id": "edit-right",
+      "changes": [
+        {
+          "role": "right",
+          "value": "next"
+        }
+      ]
+    },
+    {
+      "id": "edit-left",
+      "changes": [
+        {
+          "role": "left",
+          "value": "next"
+        }
+      ]
+    }
+  ]
+}
