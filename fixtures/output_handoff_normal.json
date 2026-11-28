@@ -1,0 +1,66 @@
+{
+  "job": "job-1",
+  "pipe": "stdio-1",
+  "generation": "stdio-1.gen0",
+  "records": [
+    {"id": "r1", "line": "parent=2\n"},
+    {"id": "r2", "line": "worker=3\n"},
+    {"id": "r3", "line": "next=4\n"}
+  ],
+  "events": [
+    {"op": "start", "proc": "p1", "pid": 100, "job": "job-1", "ppid": null},
+    {"op": "open", "proc": "p1", "handle": "h1", "pipe": "stdio-1", "generation": "stdio-1.gen0", "job": "job-1"},
+    {"op": "write", "proc": "p1", "handle": "h1", "generation": "stdio-1.gen0", "fragment": "f1", "record": "r1", "seq": 1, "text": "parent=2\n"},
+    {"op": "start", "proc": "p2", "pid": 200, "job": "job-1", "ppid": "p1"},
+    {"op": "inherit", "handle": "h1", "from": "p1", "to": "p2", "as": "h2"},
+    {"op": "close", "proc": "p1", "handle": "h1"},
+    {"op": "exit", "proc": "p1"},
+    {"op": "checkpoint", "id": "parent_exited_child_open"},
+    {"op": "write", "proc": "p2", "handle": "h2", "generation": "stdio-1.gen0", "fragment": "f2", "record": "r2", "seq": 1, "text": "worker="},
+    {"op": "write", "proc": "p2", "handle": "h2", "generation": "stdio-1.gen0", "fragment": "f3a", "record": "r2", "seq": 2, "text": "3", "delivery": "ack_lost"},
+    {"op": "retry", "proc": "p2", "handle": "h2", "generation": "stdio-1.gen0", "fragment": "f3a", "record": "r2", "seq": 2, "text": "3"},
+    {"op": "write", "proc": "p2", "handle": "h2", "generation": "stdio-1.gen0", "fragment": "f3b", "record": "r2", "seq": 3, "text": "\n", "delivery": "lost"},
+    {"op": "retry", "proc": "p2", "handle": "h2", "generation": "stdio-1.gen0", "fragment": "f3b", "record": "r2", "seq": 3, "text": "\n"},
+    {"op": "checkpoint", "id": "record_boundary_r2"},
+    {"op": "write", "proc": "p2", "handle": "h2", "generation": "stdio-1.gen0", "fragment": "f4", "record": "r3", "seq": 1, "text": "next=4\n"},
+    {"op": "close", "proc": "p2", "handle": "h2", "ack": "lost"},
+    {"op": "exit", "proc": "p2"},
+    {"op": "checkpoint", "id": "tree_closed"}
+  ],
+  "scenarios": [
+    {
+      "id": "whole_tree",
+      "consumers": [
+        {"id": "parent_download", "policy": "job_tree", "job": "job-1", "generation": "stdio-1.gen0"}
+      ],
+      "inject_at": {
+        "tree_closed": [
+          {"op": "restart"}
+        ]
+      },
+      "claims": [
+        {"artifact": "parent_download", "expect_text": "parent=2\nworker=3\nnext=4\n",
+         "expect_records": ["r1", "r2", "r3"], "immutable": true}
+      ]
+    },
+    {
+      "id": "parent_child_relay",
+      "consumers": [
+        {"id": "parent_download", "policy": "relay_source", "job": "job-1", "generation": "stdio-1.gen0", "relay": "relay-1"},
+        {"id": "child_download", "policy": "relay_target", "job": "job-1", "generation": "stdio-1.gen0", "relay": "relay-1"}
+      ],
+      "inject_at": {
+        "record_boundary_r2": [
+          {"op": "relay_request", "relay": "relay-1", "after_record": "r2"},
+          {"op": "relay_confirm", "relay": "relay-1", "status": "confirmed"}
+        ]
+      },
+      "claims": [
+        {"artifact": "parent_download", "expect_text": "parent=2\nworker=3\n",
+         "expect_records": ["r1", "r2"], "immutable": true, "must_not_contain": "next=4"},
+        {"artifact": "child_download", "expect_text": "next=4\n",
+         "expect_records": ["r3"], "immutable": true}
+      ]
+    }
+  ]
+}

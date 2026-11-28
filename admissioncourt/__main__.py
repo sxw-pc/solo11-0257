@@ -8,9 +8,10 @@ from . import dispatch
 from . import dispatch
 from .store import connect,replay,many
 from . import contract,waiver,admit
+from . import output_handoff
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('command',choices=['contract','waiver','admit','demo','replay','report','dispatch','projections','checkpoint','receiver','endorse','settlement','console-output']);p.add_argument('--db',default='demo.sqlite');p.add_argument('--fixture');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('command',choices=['contract','waiver','admit','demo','replay','report','dispatch','projections','checkpoint','receiver','endorse','settlement','console-output','output-handoff']);p.add_argument('--db',default='demo.sqlite');p.add_argument('--fixture');a=p.parse_args()
     if a.command=='replay':
         result=replay(a.db)
     else:
@@ -19,6 +20,10 @@ def main():
             if not a.fixture:
                 p.error('--fixture required')
             result=console_output.run(json.loads(Path(a.fixture).read_text(encoding='utf-8')))
+        elif a.command=='output-handoff':
+            if not a.fixture:
+                p.error('--fixture required')
+            result=output_handoff.run(json.loads(Path(a.fixture).read_text(encoding='utf-8')))
         elif a.command=='settlement':
             if not a.fixture:
                 p.error('--fixture required')
