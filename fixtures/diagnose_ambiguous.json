@@ -1,0 +1,28 @@
+{
+  "symptom": {"path": "/job/x", "status": 500},
+  "images": {"q-hotfix": {"status": 200, "revision": "v1.1"}},
+  "worlds": [
+    {
+      "name": "A",
+      "epoch": 1,
+      "routes": [{"id": "service-a", "prefix": "/job", "service": "job", "backends": ["Q", "P"]}],
+      "replicas": {
+        "Q": {"state": "healthy", "status": 500, "revision": "v1", "service": "job", "swappable": true},
+        "P": {"state": "healthy", "status": 200, "revision": "v2", "service": "job", "swappable": true}
+      }
+    },
+    {
+      "name": "B",
+      "epoch": 1,
+      "routes": [{"id": "service-a", "prefix": "/job", "service": "job", "backends": ["Q", "P"]}],
+      "replicas": {
+        "Q": {"state": "healthy", "status": 500, "revision": "v1", "service": "job", "swappable": true},
+        "P": {"state": "healthy", "status": 200, "revision": "v2", "service": "billing", "swappable": true}
+      }
+    }
+  ],
+  "authorizations": [
+    {"team": "routing", "op": "shift_route"},
+    {"team": "image", "op": "swap_image", "image": "q-hotfix"}
+  ]
+}

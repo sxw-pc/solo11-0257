@@ -1,6 +1,6 @@
 import argparse,json
 from pathlib import Path
-from . import bulletin, drill, endorse, settlement
+from . import bulletin, drill, diagnose, endorse, settlement
 from . import receiver
 from . import checkpoint
 from . import projections
@@ -10,16 +10,21 @@ from .store import connect,replay,many
 from . import contract,waiver,admit
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('command',choices=['contract','waiver','admit','demo','replay','report','dispatch','projections','checkpoint','receiver','endorse','settlement','drill','bulletin']);p.add_argument('--db',default='demo.sqlite');p.add_argument('--fixture');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('command',choices=['contract','waiver','admit','demo','replay','report','dispatch','projections','checkpoint','receiver','endorse','settlement','drill','bulletin','diagnose']);p.add_argument('--db',default='demo.sqlite');p.add_argument('--fixture');a=p.parse_args()
     if a.command=='replay':
         result=replay(a.db)
     else:
         db=connect(a.db)
-        if a.command in ('drill', 'bulletin'):
+        if a.command in ('drill', 'bulletin', 'diagnose'):
             if not a.fixture:
                 p.error('--fixture required')
             fixture=json.loads(Path(a.fixture).read_text(encoding='utf-8'))
-            result=drill.run(fixture) if a.command=='drill' else bulletin.publish(db,fixture)
+            if a.command=='drill':
+                result=drill.run(fixture)
+            elif a.command=='diagnose':
+                result=diagnose.run(fixture)
+            else:
+                result=bulletin.publish(db,fixture)
         elif a.command=='settlement':
             if not a.fixture:
                 p.error('--fixture required')

@@ -25,3 +25,5 @@ python -m unittest discover -s tests -v
 `python -m admissioncourt settlement --db demo.sqlite --fixture fixtures/settlement_normal.json` issues a synthetic service invoice from recorded receiver receipts. Run the receiver fixture first. The original invoice and line prices are retained for repeat calls.
 
 `python -m admissioncourt drill --fixture fixtures/drill_normal.json` observes synthetic request paths. `python -m admissioncourt bulletin --fixture fixtures/bulletin_normal.json` publishes aggregate results to fixture readers. Neither command connects to a service.
+
+`python -m admissioncourt diagnose --fixture fixtures/diagnose_normal.json` 在同一隔离故障基线上评估已签维修授权：初读视图只含路径与状态码，每个隔离实例只允许一次改态干预（调整一项路由优先级，或为一个副本加载已知良好的演练镜像），其余动作只读。修复单由另一个从原状态分出的合成实例独立重演核证；同观察却需要不同修复动作的世界对会作为见证保留并保持未归因，健康记录跨代的读写不得拼成同一基线的因果对照。`fixtures/diagnose_ambiguous.json` 与 `fixtures/diagnose_epoch.json` 分别回归一次合法干预不足与标签跨代的情形。
